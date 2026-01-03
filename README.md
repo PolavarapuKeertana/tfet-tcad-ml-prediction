@@ -1,11 +1,11 @@
 # tfet-tcad-ml-prediction
-Machine learning–based surrogate modeling of Double-Gate TFET characteristics using Silvaco ATLAS TCAD simulations and regression models for fast I<sub>DS</sub> prediction.
+Machine learning–based modeling of Double-Gate TFET characteristics using Silvaco ATLAS TCAD simulations and regression models for fast I<sub>DS</sub> prediction.
 
 __Motivation & Research Significance__
 
 Tunnel Field-Effect Transistors (TFETs) are widely regarded as promising candidates for next-generation ultra-low-power electronics, owing to their ability to achieve sub-60 mV/dec subthreshold swing and extremely low OFF-state leakage. However, the predictive modeling of TFETs relies heavily on Technology Computer-Aided Design (TCAD) simulations, which become computationally prohibitive when sweeping multiple structural and bias parameters.
 
-This work addresses this challenge by developing a machine learning–based surrogate modeling framework that learns TFET behavior directly from physics-accurate TCAD data, enabling:
+This work addresses this challenge by developing a machine learning–based modeling framework that learns TFET behavior directly from physics-accurate TCAD data, enabling:
 
 • Rapid exploration of TFET design space
 
@@ -30,7 +30,7 @@ Dominant Transport Mechanism: Non-local Band-to-Band Tunneling (BTBT)
 
 Accurate modeling of tunneling-dominated ON-state conduction and ultra-low OFF-state leakage
 
-• __Machine Learning Surrogate Framework__
+• __Machine Learning Framework__
 
 A high-fidelity dataset generated from TCAD simulations is used to train regression models that predict drain current (I<sub>DS</sub>) as a function of device geometry and biasing conditions.
 
@@ -48,11 +48,11 @@ Implemented Models
 
 • Polynomial Regression
 
-Among these, XGBoost exhibited the best overall performance in terms of accuracy, robustness, and generalization.
+The selected regression models were chosen to capture the strong nonlinearity and bias-dependent behavior inherent to tunneling-dominated TFET operation. Tree-based and ensemble methods are particularly well suited for learning sharp transitions, threshold shifts, and multi-parameter interactions present in TCAD-generated datasets, while remaining robust to scaling and feature correlation. Polynomial regression was included as a baseline to evaluate the benefits of nonlinear ensemble learning over simpler parametric models.
 
 __Repository Structure__
 
-tfet-ml-surrogate-modeling/
+tfet-ml-modeling/
 │
 ├── tcad/
 │
@@ -76,9 +76,9 @@ __Dataset & Parameter Space__
 
 __Input Parameters__
 
-• Gate Work Function (eV)
+• Gate Work Function (φ<sub>gate</sub>)
 
-• Gate Length (nm)
+• Gate Length (L<sub>G</sub>)
 
 • Gate-Source Voltage (V<sub>GS</sub>)
 
@@ -88,7 +88,7 @@ __Target Output__
 
 • Drain Current (I<sub>DS</sub>)
 
-All datasets were generated exclusively using Silvaco ATLAS, ensuring physics-consistent and noise-free training data suitable for surrogate modeling.
+All datasets were generated exclusively using Silvaco ATLAS, ensuring physics-consistent and noise-free training data suitable for modeling.
 
 __Parameter Configuration for ML Dataset__
 
@@ -100,7 +100,7 @@ This approach ensures physics-consistent data generation while enabling effectiv
 - Gate Length (L<sub>G</sub>)
 - Oxide Thickness (T<sub>OX</sub>)
 - Silicon Body Thickness (T<sub>Si</sub>)
-- Channel Doping (N<sub>C</sub>)
+- Channel Doping (N<sub>Si</sub>)
 - Drain Doping (N<sub>D</sub>)
 - Source Doping (N<sub>S</sub>)
 These parameters were held constant to isolate the impact of biasing and electrostatic control on TFET performance.
@@ -113,7 +113,7 @@ These parameters were held constant to isolate the impact of biasing and electro
 | Drain–Source Voltage (V<sub>DS</sub>) | 0.5 V, 1.0 V |
 | Gate–Source Voltage (V<sub>GS</sub>) | 0 – 1.5 V (step = 0.005 V) |
 
-This parameter selection captures both subthreshold and ON-state tunneling regimes, enabling the ML models to accurately learn TFET behavior across practical operating conditions.
+This parameter selection captures both subthreshold and superthreshold region, enabling the ML models to accurately learn TFET behavior across practical operating conditions.
 
 __Results & Key Observations__
 
@@ -137,15 +137,15 @@ ML Model Generalization: Training vs Test Performance (XGBoost)
 
 ![ML training vs test performance](https://github.com/user-attachments/assets/2deb232b-dd30-434a-8dc7-3bbbca47f21b)
 
-*Figure 2: Comparison of training and test predictions of the ML surrogate model for I<sub>DS</sub>–V<sub>GS</sub> characteristics at L<sub>G</sub> = 30 nm, φ<sub>G</sub> = 4.5 eV, and V<sub>DS</sub> = 0.5 V, demonstrating good generalization across bias conditions.*
+*Figure 2: Comparison of training and test predictions of the ML model for I<sub>DS</sub>–V<sub>GS</sub> characteristics at L<sub>G</sub> = 30 nm, φ<sub>G</sub> = 4.5 eV, and V<sub>DS</sub> = 0.5 V, demonstrating good generalization across bias conditions.*
 
 The current study focuses on device-level modeling and does not yet incorporate experimental validation or compact-model extraction.
 
-The ML surrogate reduces evaluation time from minutes–hours per TCAD sweep to near-instant inference, enabling rapid design-space exploration.
+The ML reduces evaluation time from minutes–hours per TCAD sweep to near-instant inference, enabling rapid design-space exploration.
 
 __Key Contributions__
 
-• Developed a physics-consistent ML surrogate model for DG-TFET IDS prediction  
+• Developed a physics-consistent ML model for DG-TFET I<sub>DS</sub> prediction  
 • Demonstrated that ensemble ML models can achieve TCAD-level accuracy (R² > 0.999)  
 • Identified XGBoost as the most robust model under parameter variation  
 • Reduced reliance on repeated TCAD simulations for design-space exploration
@@ -159,7 +159,7 @@ __Reproducibility__
 
 This structured workflow ensures reproducibility and facilitates extension of the framework to new device architectures.
 
-__Applications & Research Impact__
+__Applications__
 
 • Fast TFET design-space exploration
 
@@ -184,7 +184,7 @@ __Tools & Technologies__
 __Future Extensions & Research Directions__
 
 • Extension to heterostructure and 2D-material-based TFETs  
-The surrogate modeling framework can be extended to TFETs based on III–V semiconductors (e.g., InAs, GaSb) and emerging 2D materials (MoS₂, WSe₂), enabling the study of band alignment, tunneling efficiency, and scalability beyond silicon-based devices.
+The modeling framework can be extended to TFETs based on III–V semiconductors (e.g., InAs, GaSb) and emerging 2D materials (MoS₂, WSe₂), enabling the study of band alignment, tunneling efficiency, and scalability beyond silicon-based devices.
 
 • Incorporation of variability and reliability effects  
 Future work can incorporate process-induced variability, interface trap density, and trap-assisted tunneling effects into the ML framework, enabling predictive analysis of device reliability and robustness under nanoscale manufacturing variations.
@@ -192,11 +192,6 @@ Future work can incorporate process-induced variability, interface trap density,
 • Circuit-level and system-level integration
 Predicted TFET characteristics can be interfaced with compact models for SPICE-level simulation, facilitating the evaluation of TFET-based logic circuits and low-power systems.
 
-• Active learning for adaptive TCAD–ML co-optimization
-An active learning loop can be developed where the ML model dynamically identifies high-uncertainty regions in the design space and selectively triggers new TCAD simulations, significantly reducing simulation cost while improving model generalization.
-
-• Multi-objective optimization for energy-efficient device design
-The surrogate model can be embedded within optimization frameworks to simultaneously optimize competing metrics such as ON-current, subthreshold swing, leakage current, and energy-delay product, enabling intelligent TFET design-space exploration.
 
 __Final Note__
 
