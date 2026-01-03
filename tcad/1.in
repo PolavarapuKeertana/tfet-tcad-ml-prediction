@@ -1,0 +1,106 @@
+go atlas
+
+mesh space.mult=1
+
+#mesh auto
+x.mesh loc=0.000 spac=0.001
+x.mesh loc=0.020 spac=0.0005 
+x.mesh loc=0.022   spac=0.0005
+x.mesh loc=0.025 spac=0.0005 
+x.mesh loc=0.0275 spac=0.0005
+x.mesh loc=0.030 spac=0.0005
+x.mesh loc=0.032   spac=0.0005
+x.mesh loc=0.0325   spac=0.0005
+x.mesh loc=0.035 spac=0.0005 
+x.mesh loc=0.0375 spac=0.0005
+x.mesh loc=0.04 spac=0.0005
+x.mesh loc=0.0425 spac=0.0005
+x.mesh loc=0.045 spac=0.0005
+x.mesh loc=0.0475 spac=0.0005
+x.mesh loc=0.05 spac=0.0005
+x.mesh loc=0.0525 spac=0.0005
+x.mesh loc=0.055 spac=0.0005
+x.mesh loc=0.0575 spac=0.0005
+x.mesh loc=0.060 spac=0.0005
+x.mesh loc=0.0625 spac=0.0005
+x.mesh loc=0.065 spac=0.0005
+x.mesh loc=0.0675 spac=0.0005
+#x.mesh loc=0.065 spac=0.0005  
+x.mesh loc=0.070 spac=0.0005
+x.mesh loc=0.0725 spac=0.0005
+x.mesh loc=0.075 spac=0.0005   
+x.mesh loc=0.090 spac=0.0005
+x.mesh loc=0.100 spac=0.001
+
+#y.mesh loc=-0.003    spac=0.0005
+y.mesh loc=-0.002    spac=0.0005
+y.mesh loc=-0.001    spac=0.0005
+y.mesh loc= 0.0      spac=0.0005
+y.mesh loc= 0.010    spac=0.0005
+y.mesh loc= 0.0108    spac=0.0005
+y.mesh loc= 0.011    spac=0.0005
+y.mesh loc= 0.012    spac=0.0005
+#y.mesh loc= 0.013    spac=0.0005
+#
+
+region num= 1  x.min = 0.0 x.max = 0.10 y.min = -0.002 y.max= 0.012 material= air
+region num= 2  x.min = 0.025  x.max = 0.075  y.min = -0.001  y.max = 0.0  material= SiO2
+region num= 3  y.min = 0.0   y.max = 0.01 material = silicon
+region num= 4  x.min = 0.025  x.max = 0.075 y.min = 0.01  y.max =0.011 material = SiO2
+
+#*********** define the electrodes ************
+electrode name=DRAIN  x.min=0.0 x.max=0.0 y.min=0.0 y.max=0.010
+electrode name=SOURCE  x.min=0.1 x.max=0.1 y.min=0.0 y.max=0.010
+electrode name=GATE  x.min=0.045 x.max=0.055 y.min=0.011 y.max=0.012
+electrode name=GATE  x.min=0.045 x.max=0.055 y.min=-0.002 y.max=-0.001
+
+
+qtregion number=1 pts.normal=3 pts.tunnel=131 x1=0.06 y1=0.0 x2=0.06 y2=0.01 x3=0.080 y3=0.010  x4=0.080 y4=0.0
+qtregion number=2 pts.normal=3 pts.tunnel=131 x1=0.022 y1=0.0 x2=0.022 y2=0.01 x3=0.032 y3=0.010  x4=0.032 y4=0.0
+
+#*********** define the doping concentrations *****
+doping  uniform  conc=5e18  x.min = 0.0   x.max = 0.025 y.min = 0.0 y.max = 0.010 n.type 
+doping  uniform conc=1e17   x.min = 0.025 x.max = 0.075 y.min = 0.0 y.max = 0.010 n.type 
+doping  uniform conc=1e20   x.min = 0.075 x.max = 0.100 y.min = 0.0 y.max = 0.010 p.type 
+
+# set workfunction of gate
+
+contact name=GATE workfunction=4.5 
+#common=FGATE
+
+
+# select model
+models bbt.nonlocal bbt.forward bbt.nlderivs srh fermi bgn consrh conmob print qtunn.dir=1
+#models bbt.nonlocal bbt.forward fermi bgn srh conmob print
+#bbt.forward qtunn.dir=1 
+#bbt.nlderivs
+#consrh conmob 
+output con.band  val.band band.temp traps u.srh charge e.lines
+
+method newton trap
+
+solve init
+solve vsource=0.0
+
+solve  vdrain=0.0 vstep=0.05 vfinal=1.0  name=DRAIN 
+log   outf=1.log 
+solve  vGATE=0.0 vstep=0.05  vfinal=1.5 name=GATE
+save outf=1.str
+
+extract init inf="1.log"
+extract name="vt" (xintercept(maxslope(curve(abs(v."gate"),abs(i."drain")))) - abs(ave(v."drain"))/2.0) 
+extract name="subvt" 1.0/slope(maxslope(curve(abs(v."gate"),log10(abs(i."drain")))))
+extract name="vt_7" x.val from curve (abs(v."gate"),abs(i."drain")) where y.val=1e-7
+extract name="current_atvt_7" y.val from curve (v."gate",i."drain") where x.val=$"vt_7"
+extract name="Ion"  y.val from curve(abs(v."gate"),abs(i."drain")) where x.val=1.0
+extract name="Ioff" y.val from curve(abs(v."gate"),abs(i."drain")) where x.val=0.0
+extract name="ratio" ($"Ion"/$"Ioff")
+extract name="idsmax" max(abs(i."drain"))
+extract name="idsmin" min(abs(i."drain"))
+#extract name="avgss1"($"vt_7")/((log10(abs("current_atvt_7")))-(log10(abs("Ioff"))))
+
+
+tonyplot 1.str
+tonyplot 1.log
+
+quit
