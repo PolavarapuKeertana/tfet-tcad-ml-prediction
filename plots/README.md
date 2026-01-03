@@ -5,7 +5,7 @@ This directory contains visualization results comparing __TCAD-simulated drain c
 All plots were generated using __OriginPro 2025b__ with logarithmic current scaling to accurately capture subthreshold and ON-state tunneling behavior.
 
 
-__1. Training Dataset Performance (Gate Voltage Sweep)__
+__1. Training Dataset Performance (Gate Voltage Sweep)(Gate Vary)__
 
 __Scenario__
 • Gate–Source Voltage (V<sub>GS</sub>): 0–1.5 V (step = 0.005 V)  
@@ -38,7 +38,7 @@ __Observations__
 • Minor deviations appear only in deep subthreshold, indicating strong robustness  
 
 
-__3. Gate Work Function Variation (φ<sub>gate</sub> Vary)__
+__3. Gate Work Function Variation (φ<sub>gate</sub> Vary)(WKF)__
 
 __Scenario__
 • Gate–Source Voltage (V<sub>GS</sub>): 0–1.5 V  
@@ -69,7 +69,7 @@ __Observations__
 • No artificial smoothing or non-physical artifacts observed  
 
 
-__5. Training vs Testing Performance (TD: Train–Test Split)__
+__5. Training vs Testing Performance (TD: Train–Test Split)(Td)__
 
 __Dataset Split__
 • 70% of data used for training  
